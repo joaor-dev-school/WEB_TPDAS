@@ -19,7 +19,17 @@
     "@angular/platform-browser": "~8.2.7",
     "@angular/platform-browser-dynamic": "~8.2.7",
     "@angular/router": "~8.2.7",
-    "rxjs": "~6.4.0",
+    "angular-calendar": "^0.28.16",
+    "angular-draggable-droppable": "^4.5.3",
+    "angular-resizable-element": "^3.3.3",
+    "angularx-flatpickr": "^6.3.1",
+    "bootstrap": "^4.5.2",
+    "calendar-utils": "^0.8.1",
+    "date-fns": "^2.15.0",
+    "flatpickr": "^4.6.6",
+    "ngx-bootstrap": "^5.6.1",
+    "rrule": "^2.6.4",
+    "rxjs": "6.5.5",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },
@@ -42,6 +52,6 @@
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
-    "typescript": "~3.5.3"
+    "typescript": "3.7.5"
   }
 }
