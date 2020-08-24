@@ -1,0 +1,44 @@
+<ng-template #modalContent>
+  <div class="modal-header">
+    <h5 class="modal-title">Event</h5>
+    <button type="button" class="close" (click)="closeModal(false)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ng-container *ngIf="!isLoading">
+      <div class="d-flex flex-wrap pt-2 pb-4" *ngIf="type !== 'details' && type !== 'delete'">
+        <div *ngFor="let eventType of eventTypes; let eventTypeIndex = index"
+             class="d-flex flex-shrink-0 align-items-center">
+          <label [for]="eventType" class="cursor-pointer pr-1 mb-0">{{eventType}}</label>
+          <input type="radio" [id]="eventType" name="eventType" class="cursor-pointer"
+                 [ngModel]="eventTypeSelected" (ngModelChange)="handleEventTypeChanged($event)"
+                 [value]="eventType">
+          <span *ngIf="eventTypeIndex !== eventTypes.length - 1" class="px-2 pb-1"> | </span>
+        </div>
+      </div>
+      <ng-container *ngIf="type === 'delete'">
+        Are you sure? The event will be deleted forever!
+      </ng-container>
+      <ng-container *ngIf="type !== 'delete'">
+        <ng-container [ngSwitch]="eventTypeSelected">
+          <app-invite-form *ngSwitchCase="EventTypeEnum.INVITE"
+                           [event]="event" [type]="type"
+                           [submitObservable]="submit$"
+                           (closeEmitter)="closeModal($event)"></app-invite-form>
+          <div *ngSwitchDefault>
+            Wrong type! No form available.
+          </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="modal-footer" *ngIf="type !== 'details'">
+    <button type="button" class="btn btn-outline-primary" (click)="submitModal()">
+      OK
+    </button>
+    <button type="button" class="btn btn-outline-secondary" (click)="closeModal(false)">
+      Cancel
+    </button>
+  </div>
+</ng-template>

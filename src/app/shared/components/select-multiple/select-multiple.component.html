@@ -1,0 +1,14 @@
+<div class="d-flex flex-wrap">
+  <div class="col-12 col-md-6 p-2">
+    <span class="color-gray">Selected</span>
+    <select multiple [ngModel]="unselectedValues$ | async" class="form-control" (ngModelChange)="deselect($event)">
+      <option *ngFor="let option of (selectedList$ | async)" [value]="option.value">{{option.label}}</option>
+    </select>
+  </div>
+  <div class="col-12 col-md-6 p-2">
+    <span class="color-gray">Unselected</span>
+    <select multiple [ngModel]="selectedValues$ | async" class="form-control" (ngModelChange)="select($event)">
+      <option *ngFor="let option of (unselectedList$ | async)" [value]="option.value">{{option.label}}</option>
+    </select>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<ng-container *ngIf="!isLoading">
+  <form [formGroup]="eventForm">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <ng-container *ngIf="type === 'details'">
+        <span class="form-control-details">{{getControlValue('name')}}</span>
+      </ng-container>
+      <ng-container *ngIf="type !== 'details'">
+        <input formControlName="name" id="name" class="form-control" type="text">
+      </ng-container>
+    </div>
+    <div class="form-group" *ngIf="(usersItems$ | async) as userItems">
+      <label for="participants">Participants</label>
+      <ng-container *ngIf="type === 'details'">
+        <span class="form-control-details">{{userItemsDetails}}</span>
+      </ng-container>
+      <ng-container *ngIf="type !== 'details'">
+        <app-select-multiple id="participants" formControlName="participants"
+                             [options]="userItems"></app-select-multiple>
+      </ng-container>
+    </div>
+    <div class="form-group" *ngIf="type !== 'details'">
+      <label for="startDate">Start Date</label>
+      <input formControlName="startDate" id="startDate" class="form-control" type="text"
+             bsDatepicker [bsConfig]="{ dateInputFormat: inputDateFormat, containerClass: 'theme-green' }">
+    </div>
+    <div class="form-group" *ngIf="type !== 'details'">
+      <label for="endDate">End Date</label>
+      <input formControlName="endDate" id="endDate" class="form-control" type="text"
+             bsDatepicker [bsConfig]="{ dateInputFormat: inputDateFormat, containerClass: 'theme-blue' }">
+    </div>
+    <ng-container *ngIf="type === 'details'">
+      <label>Dates</label>
+      <span class="form-control-details" *ngFor="let date of dates">{{date}}</span>
+    </ng-container>
+    <ng-container *ngIf="type !== 'details'">
+      <div class="form-group d-flex align-items-center">
+        <label for="periodicityActive">Periodicity</label>
+        <input formControlName="periodicityActive" id="periodicityActive"
+               class="form-control checkbox-control" type="checkbox">
+      </div>
+      <ng-container *ngIf="getControlValue('periodicityActive')">
+        <div class="form-group">
+          <label for="periodicityRange">Periodicity Range</label>
+          <input formControlName="periodicityRange" id="periodicityRange" class="form-control" type="text"
+                 bsDatepicker [bsConfig]="{ dateInputFormat: inputDateFormat, containerClass: 'theme-red' }">
+        </div>
+        <hr/>
+        <button class="btn btn-link btn-no-focus px-0" (click)="addPeriodicityRule()">Add New Periodicity</button>
+        <div class="form-group periodicity-container">
+          <ng-container formArrayName="periodicityRules">
+            <div *ngFor="let ruleGroup of periodicityRulesControl.controls; let ruleIndex = index">
+              <ng-container [formGroup]="ruleGroup">
+                <div class="remove-rule-button-container">
+                  <button class="btn btn-icon" *ngIf="periodicityRulesControl.controls.length > 1"
+                          (click)="removePeriodicityRule(ruleIndex)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor"
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                            d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd"
+                            d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="form-group">
+                  <label [for]="'step'+ruleIndex">Step</label>
+                  <input formControlName="step" [id]="'step'+ruleIndex" type="number" min="1" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label [for]="'daysType'+ruleIndex">Days Type</label>
+                  <select formControlName="daysType" [id]="'daysType'+ruleIndex" class="form-control">
+                    <option *ngFor="let type of eventPeriodicityDaysTypeEnums"
+                            [value]="type">{{type}}</option>
+                  </select>
+                </div>
+                <ng-container formArrayName="days">
+                  <ng-container *ngFor="let dayGroup of getRuleDaysControl(ruleGroup).controls; let dayIndex = index">
+                    <div class="d-flex" [formGroup]="dayGroup">
+                      <div class="flex-grow-1 form-group">
+                        <label [for]="'day-'+ruleIndex+'-'+dayIndex">Day</label>
+                        <input formControlName="day" [id]="'day-'+ruleIndex+'-'+dayIndex" type="number"
+                               min="1" class="form-control">
+                      </div>
+                      <div class="flex-shrink-0 form-group">
+                        <label [for]="'include-'+ruleIndex+'-'+dayIndex">Include</label>
+                        <input formControlName="include" [id]="'include-'+ruleIndex+'-'+dayIndex" type="checkbox"
+                               class="form-control">
+                      </div>
+                      <div class="flex-shrink-0 form-group remove-day-icon-container">
+                        <button class="btn btn-icon" [disabled]="getRuleDaysControl(ruleGroup).controls.length < 2"
+                                (click)="removeDayControl(ruleGroup, dayIndex)">
+                          <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-x-circle"
+                               fill="currentColor"
+                               xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path fill-rule="evenodd"
+                                  d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                            <path fill-rule="evenodd"
+                                  d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <div class="add-day-icon-container">
+                    <button class="btn btn-icon" (click)="addDayControl(ruleGroup)">
+                      <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-plus-circle" fill="currentColor"
+                           xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                              d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
+                        <path fill-rule="evenodd"
+                              d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
+                        <path fill-rule="evenodd"
+                              d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </ng-container>
+
+  </form>
+</ng-container>

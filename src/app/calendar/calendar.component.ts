@@ -1,49 +1,23 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { CalendarEvent, CalendarEventAction, CalendarView } from 'angular-calendar';
-import { EventColor } from 'calendar-utils';
-import {
-  startOfDay,
-  endOfDay,
-  subDays,
-  addDays,
-  endOfMonth,
-  isSameDay,
-  isSameMonth,
-  addHours,
-} from 'date-fns';
-import { merge, Observable, of, Subject, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { CalendarEvent, CalendarView } from 'angular-calendar';
+import { isSameDay, isSameMonth, } from 'date-fns';
+import { merge, Observable, of, Subject, Subscription } from 'rxjs';
+import { catchError, map, take } from 'rxjs/operators';
+import { AuthService } from '../shared/auth/auth.service';
+import { EventTypeEnum } from '../shared/events/event-type.enum';
 import { EventsService } from '../shared/events/events.service';
 import { EventListModel } from '../shared/events/models/event-list.model';
-import { eventsModelToEventsCalendar } from '../shared/events/utils/events.utils';
-
-const colors: { [key: string]: EventColor } = {
-  red: {
-    primary: '#ad2121',
-    secondary: '#FAE3E3',
-  },
-  blue: {
-    primary: '#1e90ff',
-    secondary: '#D1E8FF',
-  },
-  green: {
-    primary: '#3effAA',
-    secondary: '#D1FFE8',
-  },
-  yellow: {
-    primary: '#e3bc08',
-    secondary: '#FDF1BA',
-  },
-};
+import { FormType } from '../shared/events/utils/event-form.utils';
+import { eventsModelToEventsCalendar, OpenModalModel } from '../shared/events/utils/events.utils';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
 
   view: CalendarView = CalendarView.Month;
 
@@ -51,103 +25,52 @@ export class CalendarComponent implements OnInit {
 
   refresh: Subject<any> = new Subject();
 
-  actions: CalendarEventAction[] = [
-    {
-      label: '<i class="fas fa-fw fa-pencil-alt"></i>',
-      a11yLabel: 'Edit',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.handleEvent('Edited', event);
-      },
-    },
-    {
-      label: '<i class="fas fa-fw fa-trash-alt"></i>',
-      a11yLabel: 'Delete',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter((iEvent) => iEvent !== event);
-        this.handleEvent('Deleted', event);
-      },
-    },
-  ];
-
-  events: CalendarEvent[] = [
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'A 3 day event',
-      color: colors.red,
-      actions: this.actions,
-      allDay: true,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
-    {
-      start: startOfDay(new Date()),
-      title: 'An event with no end date',
-      color: colors.yellow,
-      actions: this.actions,
-    },
-    {
-      start: subDays(endOfMonth(new Date()), 3),
-      end: addDays(endOfMonth(new Date()), 3),
-      title: 'A long event that spans 2 months',
-      color: colors.blue,
-      allDay: true,
-    },
-    {
-      start: addHours(startOfDay(new Date()), 2),
-      end: addHours(new Date(), 2),
-      title: 'A draggable and resizable event',
-      color: colors.yellow,
-      actions: this.actions,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true,
-      },
-      draggable: true,
-    },
-  ];
-
   calendarEvents$: Observable<CalendarEvent[]>;
 
-  activeDayIsOpen: boolean = true;
+  openModal$: Observable<OpenModalModel>;
 
-  private calendarEventsSubject: Subject<CalendarEvent[]>;
+  activeDayIsOpen: boolean = false;
+
+  private readonly editEventSubject: Subject<number>;
+  private readonly deleteEventSubject: Subject<number>;
+  private readonly calendarEventsSubject: Subject<CalendarEvent[]>;
+  private readonly openModalSubject: Subject<OpenModalModel>;
+  private readonly subscriptions: Subscription[];
 
   get CalendarView(): typeof CalendarView {
     return CalendarView;
   }
 
-  constructor(private readonly eventsService: EventsService) {
+  constructor(private readonly eventsService: EventsService, private readonly authService: AuthService) {
+    this.subscriptions = [];
+    this.editEventSubject = new Subject();
+    this.deleteEventSubject = new Subject();
+    this.calendarEventsSubject = new Subject();
+    this.calendarEvents$ = this.calendarEventsSubject.asObservable();
+    this.openModalSubject = new Subject();
+    this.openModal$ = this.openModalSubject.asObservable();
   }
 
   ngOnInit() {
-    this.calendarEvents$ = merge(
-      this.eventsService.fetchAll().pipe(
-        catchError((error: HttpErrorResponse) => this.handleFetchAllEventsError(error)),
-        map(eventsModelToEventsCalendar)
-      ),
-      this.calendarEventsSubject
-    );
+    this.subscribeForEventActions();
+    this.fetchEvents();
   }
 
-  addEvent(): void {
-    this.events = [
-      ...this.events,
-      {
-        title: 'New event',
-        start: startOfDay(new Date()),
-        end: endOfDay(new Date()),
-        color: colors.red,
-        draggable: true,
-        resizable: {
-          beforeStart: true,
-          afterEnd: true,
-        },
-      },
-    ];
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription: Subscription) => subscription.unsubscribe());
+  }
+
+  fetchEvents(): void {
+    this.eventsService.fetchAll().pipe(
+      take(1),
+      catchError((error: HttpErrorResponse) => this.handleFetchAllEventsError(error)),
+      map(eventsModelToEventsCalendar(this.authService.userId, this.editEventSubject, this.deleteEventSubject))
+    )
+      .subscribe((events: CalendarEvent[]) => this.calendarEventsSubject.next(events));
+  }
+
+  addEvent(type: FormType, eventId: number = null): void {
+    this.openModalSubject.next({ eventId, type });
   }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
@@ -164,18 +87,32 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  handleEvent(action: string, event: CalendarEvent): void {
-    /*this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });*/
+  openDetails(event: CalendarEvent): void {
+    this.openModalSubject.next({ type: 'details', eventId: Number(event.id) });
   }
 
   setView(view: CalendarView) {
     this.view = view;
   }
 
-  private handleFetchAllEventsError(error: HttpErrorResponse): Observable<CalendarEvent[]> {
+  setViewDate(date: Date): void {
+    this.viewDate = date;
+    this.activeDayIsOpen = false;
+  }
+
+  private subscribeForEventActions(): void {
+    this.subscriptions.push(
+      merge(
+        this.editEventSubject.pipe(map((eventId: number) => ({ eventId, type: 'edit' } as OpenModalModel))),
+        this.deleteEventSubject.pipe(map((eventId: number) => ({ eventId, type: 'delete' } as OpenModalModel)))
+      ).subscribe((formAction: OpenModalModel) => this.openModalSubject.next(formAction))
+    );
+  }
+
+  // Handlers
+  private handleFetchAllEventsError(error: HttpErrorResponse): Observable<EventListModel> {
     console.error(error);
-    return of([]);
+    return of({ items: [] });
   }
 
 }

@@ -1,0 +1,64 @@
+@import '../../../scss/colors';
+
+.periodicity-container {
+  & > *:nth-child(2n) {
+    padding: 8px 12px;
+    background: $app-color-light-gray;
+  }
+}
+
+.add-day-icon-container {
+  text-align: center;
+
+  button {
+    color: $primary;
+  }
+}
+
+.remove-day-icon-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 3px;
+
+  button {
+    color: $danger;
+  }
+}
+
+.add-day-icon-container,
+.remove-day-icon-container {
+  button {
+    box-shadow: none;
+    outline: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      color: $app-color-gray;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.remove-rule-button-container {
+  position: relative;
+  height: 30px;
+  width: 100%;
+
+  button {
+    box-shadow: none;
+    color: $app-color-gray;
+    outline: none;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

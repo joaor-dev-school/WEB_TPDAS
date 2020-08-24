@@ -1,0 +1,6 @@
+<div class="alerts-modal-container">
+  <div *ngFor="let alert of (alerts$ | async); trackBy: trackByFn">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout"
+           (onClosed)="onClose(alert)">{{ alert.message }}</alert>
+  </div>
+</div>

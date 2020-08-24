@@ -1,3 +1,23 @@
+@import './colors';
+@import './utils';
+
 * {
   box-sizing: border-box;
+}
+
+bs-datepicker-container {
+  z-index: 2000;
+  background: white;
+}
+
+input.form-control.checkbox-control {
+  display: inline-block;
+  height: auto;
+  margin: 2px 8px 6px;
+  width: auto;
+}
+
+.form-control-details {
+  display: block;
+  font-size: 1.2rem;
 }
