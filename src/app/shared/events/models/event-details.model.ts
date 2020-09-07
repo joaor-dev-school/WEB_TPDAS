@@ -20,7 +20,7 @@ export function emptyEventDetails(): EventDetailsModel {
     type: EventTypeEnum.INVITE,
     creator: null,
     participants: [],
-    dates: [{ timestamp: new Date().getTime(), duration: 360_000 }],
+    dates: [{ timestamp: new Date().getTime(), duration: 3_600_000 }],
     periodicity: null
   };
 }

@@ -1,0 +1,42 @@
+@import '../../../scss/colors';
+
+.date-container {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+
+  .date-input-container {
+    flex: 1 1 0;
+    min-width: 300px;
+    padding-right: 8px;
+  }
+
+  > div {
+    padding-bottom: 12px;
+  }
+}
+
+.add-date-icon-container {
+  text-align: center;
+
+  button {
+    box-shadow: none;
+    color: $primary;
+    outline: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      color: $app-color-gray;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.remove-date-icon-container {
+  button {
+    color: $danger;
+  }
+}

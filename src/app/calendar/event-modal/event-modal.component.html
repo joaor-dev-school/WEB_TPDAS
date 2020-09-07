@@ -14,7 +14,7 @@
           <input type="radio" [id]="eventType" name="eventType" class="cursor-pointer"
                  [ngModel]="eventTypeSelected" (ngModelChange)="handleEventTypeChanged($event)"
                  [value]="eventType">
-          <span *ngIf="eventTypeIndex !== eventTypes.length - 1" class="px-2 pb-1"> | </span>
+          <span class="px-3"><!-- Placeholder --></span>
         </div>
       </div>
       <ng-container *ngIf="type === 'delete'">
@@ -23,11 +23,15 @@
       <ng-container *ngIf="type !== 'delete'">
         <ng-container [ngSwitch]="eventTypeSelected">
           <app-invite-form *ngSwitchCase="EventTypeEnum.INVITE"
-                           [event]="event" [type]="type"
+                           [eventDetails]="event" [type]="type"
                            [submitObservable]="submit$"
                            (closeEmitter)="closeModal($event)"></app-invite-form>
           <div *ngSwitchDefault>
-            Wrong type! No form available.
+            <app-scheduling-form *ngSwitchDefault
+                                 [eventDetails]="event"
+                                 [type]="type" [eventType]="eventTypeSelected"
+                                 [submitObservable]="submit$"
+                                 (closeEmitter)="closeModal($event)"></app-scheduling-form>
           </div>
         </ng-container>
       </ng-container>

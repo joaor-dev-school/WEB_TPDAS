@@ -8,5 +8,5 @@ export interface EventPeriodicityRuleModel {
 }
 
 export function emptyEventPeriodicityRule(): EventPeriodicityRuleModel {
-  return { days: [null], daysNot: [], daysType: null, step: null };
+  return { days: [], daysNot: [], daysType: null, step: null };
 }

@@ -1,8 +1,8 @@
 <div class="container py-3">
-  <div class="row text-center">
+  <div class="title-row row text-center">
     <div class="col-md-4">
       <div class="btn-group">
-        <div class="btn btn-primary"
+        <div class="btn btn-secondary"
              mwlCalendarPreviousView
              [view]="view"
              [viewDate]="viewDate"
@@ -15,7 +15,7 @@
              (viewDateChange)="setViewDate($event)">
           Today
         </div>
-        <div class="btn btn-primary"
+        <div class="btn btn-secondary"
              mwlCalendarNextView
              [view]="view"
              [viewDate]="viewDate"
@@ -26,23 +26,36 @@
     </div>
     <div class="col-md-4">
       <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+      <div class="undo-redo-container p-2">
+        <button [disabled]="!(hasUndo$ | async) || historyOperationLoading" class="btn btn-outline-primary"
+                (click)="handleHistoryClick('undo')">
+          Undo
+        </button>
+        <button [disabled]="!(hasRedo$ | async) || historyOperationLoading" class="btn btn-outline-primary"
+                (click)="handleHistoryClick('redo')">
+          Redo
+        </button>
+      </div>
+      <div class="text-center">
+        <button class="btn btn-primary float-right" (click)="addEvent('create')">Add new</button>
+      </div>
     </div>
     <div class="col-md-4">
       <div class="btn-group">
         <div
-          class="btn btn-primary"
+          class="btn btn-secondary"
           (click)="setView(CalendarView.Month)"
           [class.active]="view === CalendarView.Month">
           Month
         </div>
         <div
-          class="btn btn-primary"
+          class="btn btn-secondary"
           (click)="setView(CalendarView.Week)"
           [class.active]="view === CalendarView.Week">
           Week
         </div>
         <div
-          class="btn btn-primary"
+          class="btn btn-secondary"
           (click)="setView(CalendarView.Day)"
           [class.active]="view === CalendarView.Day">
           Day
@@ -77,18 +90,15 @@
     </mwl-calendar-day-view>
   </div>
 
-  <!-- Everything you see below is just for the demo, you don't need to include it in your app -->
-
-  <br/><br/><br/>
-
-  <h3>
-    Edit events
-    <button class="btn btn-primary float-right" (click)="addEvent('create')">
-      Add new
-    </button>
-    <div class="clearfix"></div>
-  </h3>
+  <div class="row">
+    <div class="col d-flex align-items-center justify-content-end">
+      <span class="p-2">Show only my events?</span>
+      <input type="checkbox" [ngModel]="isOnlyMyEvents" (ngModelChange)="changeOnlyMyEventsState($event)"/>
+    </div>
+  </div>
 </div>
 
+<app-user-events-table [eventsList]="myEvents$ | async"
+                       (eventStatusChanged)="eventStatusChanged()"></app-user-events-table>
 <app-event-modal [openModal]="openModal$" (changesMade)="fetchEvents()"></app-event-modal>
 

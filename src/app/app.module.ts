@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
 import { CoreModule } from './core/core.module';
 import { Interceptor } from './shared/auth/interceptor';
 
@@ -13,6 +14,7 @@ import { Interceptor } from './shared/auth/interceptor';
     AppComponent
   ],
   imports: [
+    AuthModule,
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,

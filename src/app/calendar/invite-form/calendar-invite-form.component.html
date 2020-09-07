@@ -88,8 +88,7 @@
                                class="form-control">
                       </div>
                       <div class="flex-shrink-0 form-group remove-day-icon-container">
-                        <button class="btn btn-icon" [disabled]="getRuleDaysControl(ruleGroup).controls.length < 2"
-                                (click)="removeDayControl(ruleGroup, dayIndex)">
+                        <button class="btn btn-icon" (click)="removeDayControl(ruleGroup, dayIndex)">
                           <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-x-circle"
                                fill="currentColor"
                                xmlns="http://www.w3.org/2000/svg">
@@ -124,6 +123,5 @@
         </div>
       </ng-container>
     </ng-container>
-
   </form>
 </ng-container>

@@ -1,22 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { addDays } from 'date-fns';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { formatDate, parseDate } from 'ngx-bootstrap/chronos';
-import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
-import { filter, map, take, withLatestFrom } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { AlertModalManagerService } from '../../shared/alert-manager/alert-modal-manager.service';
+import { createFormErrorAlert, createFormSuccessAlert } from '../../shared/alert-manager/models/alert-modal.model';
 import { AuthService } from '../../shared/auth/auth.service';
 import { EventPeriodicityDaysTypeEnum } from '../../shared/events/event-periodicity-days-type.enum';
 import { EventsService } from '../../shared/events/events.service';
-import { EventSubmitModel } from '../../shared/events/models/event-submit.model';
+import { EventForm } from '../../shared/events/form/event-form';
+import { InviteSubmitModel } from '../../shared/events/models/invite-submit.model';
 import { formattedTime, FormType, mapPeriodicityRulesToFormControls } from '../../shared/events/utils/event-form.utils';
-import { emptyEventDetails, EventDetailsModel } from '../../shared/events/models/event-details.model';
+import { EventDetailsModel } from '../../shared/events/models/event-details.model';
 import { EventParticipantModel } from '../../shared/events/models/event-participant.model';
 import { emptyEventPeriodicityRule, EventPeriodicityRuleModel } from '../../shared/events/models/event-periodicity-rule.model';
 import { DateModel } from '../../shared/models/date.model';
-import { SelectItemModel } from '../../shared/models/select-item.model';
 import { UserModel } from '../../shared/users/models/user.model';
-import { UsersListModel } from '../../shared/users/models/users-list.model';
 import { UsersService } from '../../shared/users/users.service';
 
 @Component({
@@ -24,15 +24,23 @@ import { UsersService } from '../../shared/users/users.service';
   templateUrl: './calendar-invite-form.component.html',
   styleUrls: ['./calendar-invite-form.component.scss']
 })
-export class CalendarInviteFormComponent implements OnInit, OnDestroy {
+export class CalendarInviteFormComponent extends EventForm implements OnInit, OnDestroy {
 
-  @Input() event: EventDetailsModel;
+  @Input() eventDetails: EventDetailsModel;
 
   @Input() submitObservable: Observable<void>;
 
   @Output() closeEmitter: EventEmitter<boolean>;
 
   @Input() type: FormType;
+
+  get submit$(): Observable<void> {
+    return this.submitObservable;
+  }
+
+  get event(): EventDetailsModel {
+    return this.eventDetails;
+  }
 
   get eventPeriodicityDaysTypeEnums(): EventPeriodicityDaysTypeEnum[] {
     return [
@@ -46,45 +54,28 @@ export class CalendarInviteFormComponent implements OnInit, OnDestroy {
   }
 
   get dates(): string[] {
-    return this.event.dates.map((date: DateModel) => `${formatDate(new Date(date.timestamp), this.inputDateFormat)} (${formattedTime(date.duration, this.durationFormat).split(':').join('h ')}m)`);
+    return this.event.dates.map((date: DateModel) => `${
+      formatDate(new Date(date.timestamp), this.inputDateFormat)} (${
+      formattedTime(date.duration, this.durationFormat).split(':').join('h ')}m)`);
   }
-
-  eventForm: FormGroup;
-
-  usersItems$: Observable<SelectItemModel[]>;
-
-  isLoading: boolean;
 
   get userItemsDetails(): string {
     return this.usersListSubject.value?.items.map((item: UserModel) => item.username).join(', ');
   }
 
-  readonly inputDateFormat: string;
-  readonly durationFormat: string;
-
-  private readonly usersListSubject: BehaviorSubject<UsersListModel>;
-  private readonly subscriptions: Subscription[];
-
-  constructor(private readonly cd: ChangeDetectorRef, private readonly fb: FormBuilder, private readonly eventsService: EventsService,
-              private readonly usersService: UsersService, private readonly authService: AuthService) {
+  constructor(private readonly fb: FormBuilder, private readonly eventsService: EventsService,
+              private readonly _usersService: UsersService, private readonly authService: AuthService,
+              private readonly _alertService: AlertModalManagerService) {
+    super(_usersService, _alertService);
     this.closeEmitter = new EventEmitter();
-    this.isLoading = true;
-    this.inputDateFormat = 'MMMM Do YYYY, h:mm:ss a';
-    this.durationFormat = 'h:mm';
-    this.subscriptions = [];
-    this.usersListSubject = new BehaviorSubject(null);
-    this.usersItems$ = this.usersListSubject.pipe(map((usersList: UsersListModel) =>
-      usersList.items.map((user: UserModel) => ({ label: user.username, value: user.id }))));
   }
 
   ngOnInit(): void {
-    this.isLoading = true;
-    this.fetchUsers();
-    this.subscriptions.push(this.submitObservable.subscribe(() => this.submit()));
+    super.onInit();
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription: Subscription) => subscription.unsubscribe());
+    super.onDestroy();
   }
 
   getControlValue(name: string): any {
@@ -107,6 +98,21 @@ export class CalendarInviteFormComponent implements OnInit, OnDestroy {
     newRuleControls.forEach((newRuleControl: AbstractControl) => this.periodicityRulesControl.push(newRuleControl));
   }
 
+  buildEventForm(event: EventDetailsModel): void {
+    this.eventForm = this.fb.group({
+      name: this.fb.control(event.name, Validators.required),
+      participants: this.fb.control(event.participants.map((participant: EventParticipantModel) => participant.participantId)),
+      startDate: this.fb.control(formatDate(new Date(event.dates[0].timestamp), this.inputDateFormat)),
+      endDate: this.fb.control(formatDate(new Date(event.dates[0].timestamp + event.dates[0].duration),
+        this.inputDateFormat)),
+      periodicityActive: this.fb.control(!!event.periodicity),
+      periodicityRules: this.fb.array(mapPeriodicityRulesToFormControls(this.fb,
+        event.periodicity?.rules || [emptyEventPeriodicityRule()])),
+      periodicityRange: this.fb.control(event.periodicity &&
+        formatDate(new Date(event.periodicity.rangeTimestamp), this.inputDateFormat))
+    });
+  }
+
   removeDayControl(ruleGroup: AbstractControl, dayControlIndex: number): void {
     this.getRuleDaysControl(ruleGroup).removeAt(dayControlIndex);
   }
@@ -127,19 +133,7 @@ export class CalendarInviteFormComponent implements OnInit, OnDestroy {
       );
   }
 
-  private fetchUsers(): void {
-    this.subscriptions.push(
-      this.usersService.fetchAll()
-        .pipe(take(1))
-        .subscribe((users: UsersListModel) => {
-          this.usersListSubject.next(users);
-          this.buildEventForm(this.event || emptyEventDetails());
-          this.isLoading = false;
-        })
-    );
-  }
-
-  private getSubmitModel(): EventSubmitModel {
+  private getSubmitModel(): InviteSubmitModel {
     const startTime: number = this.getControlValue('startDate')
       && parseDate(this.getControlValue('startDate'), this.inputDateFormat).getTime() || 0;
     const endTime: number = this.getControlValue('endDate')
@@ -149,7 +143,7 @@ export class CalendarInviteFormComponent implements OnInit, OnDestroy {
       creatorId: this.authService.userId,
       date: {
         timestamp: startTime,
-        duration: Math.abs(startTime - endTime)
+        duration: endTime - startTime
       },
       participantsIds: this.getControlValue('participants'),
       periodicity: !this.getControlValue('periodicityActive') ? undefined : {
@@ -180,27 +174,14 @@ export class CalendarInviteFormComponent implements OnInit, OnDestroy {
     };
   }
 
-  private buildEventForm(event: EventDetailsModel): void {
-    this.eventForm = this.fb.group({
-      name: this.fb.control(event.name, Validators.required),
-      participants: this.fb.control(event.participants.map((participant: EventParticipantModel) => participant.participantId)),
-      startDate: this.fb.control(formatDate(new Date(event.dates[0].timestamp), this.inputDateFormat)),
-      endDate: this.fb.control(formatDate(new Date(event.dates[0].timestamp + event.dates[0].duration),
-        this.inputDateFormat)),
-      periodicityActive: this.fb.control(!!event.periodicity),
-      periodicityRules: this.fb.array(mapPeriodicityRulesToFormControls(this.fb,
-        event.periodicity?.rules || [emptyEventPeriodicityRule()])),
-      periodicityRange: this.fb.control(event.periodicity &&
-        formatDate(new Date(event.periodicity.rangeTimestamp), this.inputDateFormat))
-    });
-  }
-
   // HANDLERS
   private handleSubmitSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Invite submitted with success!'));
     this.closeEmitter.emit(true);
   }
 
   private handleSubmitError(error: HttpErrorResponse): void {
     console.error('Error submitting an new invite event', error);
+    this.alertService.next(createFormErrorAlert('Error submitting the invite form! Please try again later'));
   }
 }

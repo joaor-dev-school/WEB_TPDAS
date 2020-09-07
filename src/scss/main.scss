@@ -1,5 +1,6 @@
 @import './colors';
 @import './utils';
+@import './variables';
 
 * {
   box-sizing: border-box;
@@ -20,4 +21,9 @@ input.form-control.checkbox-control {
 .form-control-details {
   display: block;
   font-size: 1.2rem;
+}
+
+.nav-bar-container {
+  height: $app-nav-height;
+  position: relative;
 }

@@ -3,3 +3,9 @@ export enum EventTypeEnum {
   INVITE = 'INVITE',
   SCHEDULING_AUTOMATIC = 'SCHEDULING_AUTOMATIC'
 }
+
+export const eventTypesList: () => EventTypeEnum[] = (): EventTypeEnum[] => [
+  EventTypeEnum.INVITE,
+  EventTypeEnum.SCHEDULING_COLLABORATIVE,
+  EventTypeEnum.SCHEDULING_AUTOMATIC
+];

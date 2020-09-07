@@ -1,0 +1,18 @@
+<div class="wrapper">
+  <div id="formContent">
+    <div class="calendar-icon-container">
+      <img src="../../../assets/calendar-icon.png" alt="Calendar Icon"/>
+    </div>
+    <form [formGroup]="loginForm">
+      <div *ngIf="hasError" class="alert alert-danger">
+        Login failed! Wrong username or password
+      </div>
+      <input type="text" id="login" name="login" placeholder="login"
+             formControlName="username" (keyup)="hasError = false">
+      <input type="password" id="password" name="login" placeholder="password"
+             formControlName="password" (keyup)="hasError = false">
+      <button [disabled]="isSubmitting" (click)="submit()">Log In</button>
+    </form>
+
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="user-events-table">
+  <ng-container *ngFor="let eventType of eventTypesList">
+    <ng-container *ngIf="(eventsMap$.get(eventType) | async) as events">
+      <div *ngIf="events.length" class="user-events-cell">
+        <h2>{{eventType}}</h2>
+        <div *ngFor="let event of events"
+             (click)="selectedEvent = !selectedEvent ? event : null; $event.stopPropagation()">
+          <ng-container [ngSwitch]="event.userState">
+            <div *ngSwitchCase="EventParticipantStateEnum.NEW" class="alert alert-warning">
+              <span>{{event.eventName}}</span>
+              <ng-container [ngTemplateOutlet]="eventDates" [ngTemplateOutletContext]="{event: event}"></ng-container>
+              <button class="btn btn-link" (click)="changeStatus(event, EventParticipantStateEnum.ACCEPTED, $event)"
+                      *ngIf="selectedEvent?.eventId === event.eventId">
+                Accept
+              </button>
+              <button class="btn btn-link" (click)="changeStatus(event, EventParticipantStateEnum.DECLINED, $event)"
+                      *ngIf="selectedEvent?.eventId === event.eventId">
+                Decline
+              </button>
+            </div>
+            <div *ngSwitchCase="EventParticipantStateEnum.ACCEPTED" class="alert alert-success"
+                 [class.alert-success]="event.eventDates.length < 2"
+                 [class.alert-info]="event.eventDates.length > 1">
+              <ng-container [ngTemplateOutlet]="eventScheduling"
+                            [ngTemplateOutletContext]="{event: event, stateLabel: 'Accepted'}"></ng-container>
+            </div>
+            <div *ngSwitchCase="EventParticipantStateEnum.DECLINED" class="alert alert-danger">
+              <ng-container [ngTemplateOutlet]="eventScheduling"
+                            [ngTemplateOutletContext]="{event: event, stateLabel: 'Declined'}"></ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #eventScheduling let-event="event" let-stateLabel="stateLabel">
+  <span>{{event.eventName}}</span>
+  <span>{{stateLabel}}</span>
+  <button class="btn btn-link color-gray"
+          (click)="changeStatus(event, EventParticipantStateEnum.NEW, $event, event)">
+    Change
+  </button>
+  <ng-container [ngTemplateOutlet]="eventDates" [ngTemplateOutletContext]="{event: event}"></ng-container>
+</ng-template>
+
+<ng-template #eventDates let-event="event">
+  <div *ngIf="selectedEvent?.eventId === event.eventId" class="event-dates" @fade>
+    <div class="row m-0" *ngIf="event.userState === EventParticipantStateEnum.NEW">
+      <div class="col col-10" [class.col-10]="showPreferences(event)" [class.col-11]="!showPreferences(event)"></div>
+      <ng-container *ngIf="showPreferences(event)">
+        <div class="col col-1">A</div>
+        <div class="col col-1">P</div>
+      </ng-container>
+    </div>
+    <div *ngFor="let dateView of event.eventDatesView" class="row m-0"
+         (click)="$event.stopPropagation()">
+      <div class="col" [class.col-10]="showPreferences(event)" [class.col-11]="!showPreferences(event)">
+        {{dateView.date}}
+      </div>
+      <ng-container *ngIf="showPreferences(event)">
+        <div class="col col-1">
+          <input type="checkbox" [(ngModel)]="dateView.preferences.acceptable"/>
+        </div>
+        <div class="col col-1">
+          <input type="checkbox" [(ngModel)]="dateView.preferences.preferred"/>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

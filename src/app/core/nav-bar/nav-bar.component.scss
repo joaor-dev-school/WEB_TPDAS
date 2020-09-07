@@ -1,0 +1,53 @@
+@import '../../../scss/colors';
+@import '../../../scss/variables';
+
+.nav-bar {
+  color: white;
+  background-color: $app-nav-background-color;
+  border-bottom: 1px solid $app-nav-border-color;
+  box-shadow: 0 8px 6px -6px $app-nav-border-color;
+  height: $app-nav-height;
+  min-width: 100%;
+  padding: 0 20px;
+  position: fixed;
+  transition: $app-menu-animation-time-show ease;
+  width: 100%;
+  z-index: $app-nav-z-index;
+
+  .nav-bar-content {
+    align-items: center;
+    display: flex;
+
+    .profile-info-container {
+      flex-wrap: nowrap;
+
+      .avatar {
+        border-radius: 50%;
+        flex-shrink: 0;
+        height: 24px;
+        width: 24px;
+      }
+
+      span {
+        display: none;
+        padding: 0 8px;
+      }
+    }
+  }
+}
+
+@media (min-width: $app-screen-sm) {
+  .nav-bar {
+    .nav-bar-content {
+      .profile-info-container {
+        span {
+          display: block;
+          max-width: 300px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}

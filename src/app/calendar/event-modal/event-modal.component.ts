@@ -3,6 +3,8 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef,
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { merge, Observable, of, Subject, Subscription } from 'rxjs';
 import { filter, switchMap, take, tap } from 'rxjs/operators';
+import { AlertModalManagerService } from '../../shared/alert-manager/alert-modal-manager.service';
+import { createFormErrorAlert, createFormSuccessAlert } from '../../shared/alert-manager/models/alert-modal.model';
 import { EventTypeEnum } from '../../shared/events/event-type.enum';
 import { EventsService } from '../../shared/events/events.service';
 import { EventDetailsModel } from '../../shared/events/models/event-details.model';
@@ -49,7 +51,8 @@ export class EventModalComponent implements OnInit, OnDestroy {
   private readonly submitSubject: Subject<void>;
   private readonly subscriptions: Subscription[];
 
-  constructor(private modalService: BsModalService, private readonly eventsService: EventsService) {
+  constructor(private modalService: BsModalService, private readonly eventsService: EventsService,
+              private readonly alertService: AlertModalManagerService) {
     this.changesMade = new EventEmitter();
     this.subscriptions = [];
     this.openModalSubject = new Subject();
@@ -107,7 +110,7 @@ export class EventModalComponent implements OnInit, OnDestroy {
             ? this.eventsService.fetch(formAction.eventId) : of(null))
         )
         .subscribe((eventDetails: EventDetailsModel) => {
-          this.eventTypeSelected = this.eventTypeSelected || this.event?.type || EventTypeEnum.INVITE;
+          this.eventTypeSelected = this.eventTypeSelected || eventDetails?.type || EventTypeEnum.INVITE;
           this.event = eventDetails;
           if (!this.modalRef) {
             this.modalRef = this.modalService.show(this.modalContent, { class: 'modal-xl' });
@@ -123,11 +126,12 @@ export class EventModalComponent implements OnInit, OnDestroy {
   }
 
   private handleDeleteEventSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Event deleted with success'));
     this.closeModal(true);
   }
 
   private handleDeleteEventError(error: HttpErrorResponse): void {
-    console.error(error);
-    // TODO: implement this.
+    console.error('Error submitting an new invite event', error);
+    this.alertService.next(createFormErrorAlert('Error deleting the event! Please try again later'));
   }
 }

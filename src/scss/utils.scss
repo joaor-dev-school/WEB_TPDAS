@@ -1,7 +1,15 @@
 @import './colors';
 
 .color-gray {
-  color: $app-color-gray;
+  color: $app-color-gray !important;
+}
+
+.color-black {
+  color: $app-color-black !important;
+}
+
+.color-white {
+  color: $app-color-white !important;
 }
 
 .btn-no-focus {
@@ -13,4 +21,8 @@
 
 .cursor-pointer {
   cursor: pointer !important;
+}
+
+.invisible {
+  visibility: hidden;
 }

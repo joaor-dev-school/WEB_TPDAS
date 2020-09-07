@@ -1,0 +1,28 @@
+<nav class="nav-bar navbar-dark">
+  <div class="w-100 h-100 d-flex justify-content-between align-items-center">
+    <button class="navbar-toggler" type="button" (click)="openActionsModal()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="nav-bar-content position-relative" dropdown>
+      <div class="d-flex align-items-center cursor-pointer profile-info-container dropdown-toggle"
+           dropdownToggle aria-controls="menu-dropdown">
+        <img class="avatar" src="../../../assets/avatar.jpeg"/>
+        <span class="ml-xs">{{ name }}</span>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-right cursor-pointer" id="menu-dropdown" *dropdownMenu
+          role="menu" aria-labelledby="button-basic">
+        <li (click)="editProfile()" class="dropdown-item d-flex p-2">
+          <fa-icon [icon]="profileIcon"></fa-icon>
+          <span class="pl-3">Edit Profile</span>
+        </li>
+        <li (click)="logout()" class="dropdown-item d-flex p-2">
+          <fa-icon [icon]="logoutIcon"></fa-icon>
+          <span class="pl-3">Logout</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<ng-template #menu>
+</ng-template>

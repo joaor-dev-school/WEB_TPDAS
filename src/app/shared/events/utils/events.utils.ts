@@ -1,16 +1,21 @@
 import { CalendarEventAction } from 'angular-calendar';
 import { CalendarEvent } from 'calendar-utils';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 
 import { DateModel } from '../../models/date.model';
 import { EventCalendarTypeEnum } from '../event-calendar-type.enum';
 import { EventTypeEnum } from '../event-type.enum';
 import { EventListItemModel } from '../models/event-list-item.model';
 import { EventListModel } from '../models/event-list.model';
+import { EventParticipantModel } from '../models/event-participant.model';
 import { EventColorsUtils } from './event-colors.utils';
 import { FormType } from './event-form.utils';
 
 type ActionsFn = (eventId: number) => CalendarEventAction[];
+
+export const INPUT_DATE_FORMAT = 'MMMM Do YYYY, h:mm:ss a';
+export const DURATION_FORMAT = 'h:mm';
 
 export interface OpenModalModel {
   eventId?: number;
@@ -18,15 +23,63 @@ export interface OpenModalModel {
   type: FormType;
 }
 
-export function eventsModelToEventsCalendar(userId: number, editSubject: Subject<number>,
-                                            deleteSubject: Subject<number>): (eventsList: EventListModel) => CalendarEvent[] {
-  return (eventsList: EventListModel): CalendarEvent[] => {
-    let calendarEvents: CalendarEvent[] = [];
-    for (const event of eventsList.items) {
-      calendarEvents = [...calendarEvents, ...createEventCalendar(event, userId === event.creator
-        ? actions(editSubject, deleteSubject) : undefined)];
+export interface CalendarEventSubjectModel {
+  event: EventListItemModel;
+  calendarEvents: CalendarEvent[];
+}
+
+export interface CalendarEventsSubjectModel {
+  items: CalendarEventSubjectModel[];
+}
+
+export function toCalendarEvents(userId: number, onlyMyEvents: boolean):
+  (source: Observable<CalendarEventsSubjectModel>) => Observable<CalendarEvent[]> {
+  return (source: Observable<CalendarEventsSubjectModel>): Observable<CalendarEvent[]> => {
+    let res: Observable<CalendarEventsSubjectModel> = source;
+    if (onlyMyEvents) {
+      res = res.pipe(toMyEvents(userId));
     }
-    return calendarEvents;
+    return res.pipe(map((event: CalendarEventsSubjectModel) =>
+      event.items.map((eventItem: CalendarEventSubjectModel) => eventItem.calendarEvents)
+        .reduce((prev: CalendarEvent[], cur: CalendarEvent[]) => [...prev, ...cur], [])));
+  };
+}
+
+export function toEventsList(userId: number, onlyMyEvents: boolean):
+  (source: Observable<CalendarEventsSubjectModel>) => Observable<EventListModel> {
+  return (source: Observable<CalendarEventsSubjectModel>): Observable<EventListModel> => {
+    let res: Observable<CalendarEventsSubjectModel> = source;
+    if (onlyMyEvents) {
+      res = res.pipe(toMyEvents(userId));
+    }
+    return res.pipe(map((event: CalendarEventsSubjectModel) => ({
+      items: event.items.map((eventItem: CalendarEventSubjectModel) => eventItem.event)
+    })));
+  };
+}
+
+function toMyEvents(userId: number) {
+  return (source: Observable<CalendarEventsSubjectModel>): Observable<CalendarEventsSubjectModel> => {
+    return source.pipe(
+      map((event: CalendarEventsSubjectModel) => ({
+        items: event.items.filter((eventItem: CalendarEventSubjectModel) => !!eventItem.event.participants
+          .find((participant: EventParticipantModel) => participant.participantId === userId))
+      })));
+  };
+}
+
+export function eventsModelToEventsCalendar(userId: number, editSubject: Subject<number>,
+                                            deleteSubject: Subject<number>): (eventsList: EventListModel) => CalendarEventsSubjectModel {
+  return (eventsList: EventListModel): CalendarEventsSubjectModel => {
+    let events: CalendarEventSubjectModel[] = [];
+    for (const event of eventsList.items) {
+      console.log(event, createEventCalendar(event, userId === event.creator ? actions(editSubject, deleteSubject) : undefined));
+      events = [...events, {
+        calendarEvents: createEventCalendar(event, userId === event.creator ? actions(editSubject, deleteSubject) : undefined),
+        event
+      }];
+    }
+    return { items: events };
   };
 }
 
@@ -56,7 +109,7 @@ function createEventCalendar(event: EventListItemModel, action: ActionsFn): Cale
     start: new Date(eventDate.timestamp),
     end: new Date(eventDate.timestamp + eventDate.duration),
     title: event.name,
-    color: EventColorsUtils.getColor(eventCalendarType),
+    color: EventColorsUtils.getColor(eventCalendarType, event.dates.length),
     actions: action && action(event.eventId)
   }));
 }

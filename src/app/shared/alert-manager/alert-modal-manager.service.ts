@@ -6,6 +6,7 @@ import { AlertModalModel } from './models/alert-modal.model';
   providedIn: 'root'
 })
 export class AlertModalManagerService {
+  private static countAlerts: number = 0;
 
   private alertSubject: BehaviorSubject<AlertModalModel[]>;
 
@@ -18,6 +19,7 @@ export class AlertModalManagerService {
   }
 
   next(alert: AlertModalModel): void {
+    alert.id = ++AlertModalManagerService.countAlerts;
     this.alertSubject.next([...this.alertSubject.value, alert]);
   }
 

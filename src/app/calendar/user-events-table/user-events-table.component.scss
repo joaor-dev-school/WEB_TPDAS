@@ -1,0 +1,44 @@
+.user-events-table {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: auto;
+  padding: 20px 100px;
+  max-width: 1550px;
+
+  .user-events-cell {
+    margin: 0;
+    min-width: 500px;
+    flex: 1 1 33%;
+    padding: 20px;
+  }
+
+  .alert {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    > span:first-child {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-left: 10px;
+      margin-right: 20px;
+    }
+
+    .btn {
+      color: inherit;
+    }
+  }
+
+  .event-dates {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 20px 10px;
+    margin: 10px auto;
+    width: 100%;
+  }
+}
