@@ -1,0 +1,73 @@
+<div class="wrapper">
+  <div id="formContent">
+    <div class="calendar-icon-container">
+      <img src="../../../assets/calendar-icon.png" alt="Calendar Icon" />
+    </div>
+    <form [formGroup]="userProfileForm" *ngIf="state.password == currentState">
+      <table>
+        <tr>
+          <td text-align: left>Password</td>
+          <input
+            type="password"
+            id="password"
+            name="login"
+            placeholder="password"
+            formControlName="password"
+          />
+        </tr>
+      </table>
+      <button (click)="changeProfile()">Submit</button>
+
+      <button (click)="exitChangeProfile()">Exit</button>
+    </form>
+
+    <form [formGroup]="userProfileForm" *ngIf="state.menu == currentState">
+      <button (click)="enterChangePass()">Change Password</button>
+      <button (click)="enterChangeUser()">Change Username</button>
+
+      <button (click)="exitChangeProfile()">Exit</button>
+    </form>
+
+    <form
+      [formGroup]="userProfileForm"
+      *ngIf="state.changeUsername == currentState"
+    >
+      <table>
+        <tr>
+          <td text-align: left>Username</td>
+          <input
+            type="text"
+            id="login"
+            name="login"
+            placeholder="login"
+            formControlName="username"
+          />
+        </tr>
+      </table>
+      <button>Submit</button>
+
+      <button (click)="exitChangeProfile()">Exit</button>
+    </form>
+
+    <form
+      [formGroup]="userProfileForm"
+      *ngIf="state.changePassword == currentState"
+    >
+      <table>
+        <tr>
+          <td text-align: left>New password</td>
+          <input
+            type="password"
+            id="newpassword"
+            name="login"
+            placeholder="New password"
+            formControlName="newpassword"
+          />
+        </tr>
+      </table>
+      <button>Submit</button>
+
+      <button (click)="exitChangeProfile()">Exit</button>
+    </form>
+  </div>
+</div>
