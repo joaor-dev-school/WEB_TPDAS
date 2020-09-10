@@ -61,6 +61,7 @@ export class EventModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.modalService.onHide.subscribe(() => this.modalRef = null));
     this.subscribeForOpenModal();
     this.subscribeForDeleteAction();
   }

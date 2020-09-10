@@ -8,17 +8,25 @@
   <div class="modal-body">
     <ng-container *ngIf="!isLoading; else loading">
       <ng-container *ngIf="!hasError; else error">
-        <ng-container *ngIf="filenames?.length; else empty">
-          <div *ngFor="let filename of filenames">
-            <span class="filename-label">{{filename}}</span>
+        <div class="d-flex form-group">
+          <input class="form-control" [(ngModel)]="filenameValue">
+          <button class="btn btn-icon check-btn" [class.disabled]="!filenameValue" (click)="saveCalendar()">
             <fa-icon [icon]="checkIcon"></fa-icon>
-            <fa-icon [icon]="minusIcon"></fa-icon>
+          </button>
+        </div>
+        <ng-container *ngIf="filenames?.length; else empty">
+          <div *ngFor="let filename of filenames" class="d-flex align-items-center px-3 py-1">
+            <span class="filename-label mr-3 flex-shrink-1" (click)="loadCalendar(filename)">{{filename}}</span>
+            <button class="btn btn-icon cursor-pointer p-0" (click)="removeCalendar(filename)">
+              <fa-icon [icon]="minusIcon"></fa-icon>
+            </button>
           </div>
         </ng-container>
       </ng-container>
     </ng-container>
   </div>
   <div class="modal-footer">
+    <button class="btn btn-outline-danger" (click)="resetCalendar()">Reset Calendar</button>
     <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">
       Close
     </button>
@@ -26,13 +34,13 @@
 </ng-template>
 
 <ng-template #loading>
-
+  Loading...
 </ng-template>
 
 <ng-template #error>
-
+  <div class="alert alert-danger">Error on calendar store files! Please try again later...</div>
 </ng-template>
 
 <ng-template #empty>
-
+  <div>No files found</div>
 </ng-template>

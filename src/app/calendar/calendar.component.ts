@@ -5,6 +5,7 @@ import { CalendarEvent, CalendarView } from 'angular-calendar';
 import { isSameDay, isSameMonth, } from 'date-fns';
 import { BehaviorSubject, merge, Observable, of, Subject, Subscription } from 'rxjs';
 import { catchError, filter, map, take } from 'rxjs/operators';
+import { ActionsModalService } from '../shared/actions-modal/actions-modal.service';
 
 import { AlertModalManagerService } from '../shared/alert-manager/alert-modal-manager.service';
 import { createFormErrorAlert, createFormSuccessAlert, createListErrorAlert } from '../shared/alert-manager/models/alert-modal.model';
@@ -65,7 +66,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private readonly subscriptions: Subscription[];
 
   constructor(private readonly eventsService: EventsService, private readonly authService: AuthService,
-              private readonly alertService: AlertModalManagerService) {
+              private readonly alertService: AlertModalManagerService, private readonly actionsService: ActionsModalService) {
     this.subscriptions = [];
     this.editEventSubject = new Subject();
     this.deleteEventSubject = new Subject();
@@ -87,6 +88,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         // Empty by design.
       });
+    this.subscriptions.push(this.actionsService.changesMade.subscribe(() => this.eventStatusChanged()));
     this.subscribeForEventActions();
     this.fetchEvents();
   }
@@ -180,5 +182,4 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.alertService.next(createFormErrorAlert(`Error trying to ${type} the operation! Operation history will be reset`));
     this.eventsService.resetCountChanges(this.authService.userId);
   }
-
 }

@@ -73,7 +73,6 @@ export function eventsModelToEventsCalendar(userId: number, editSubject: Subject
   return (eventsList: EventListModel): CalendarEventsSubjectModel => {
     let events: CalendarEventSubjectModel[] = [];
     for (const event of eventsList.items) {
-      console.log(event, createEventCalendar(event, userId === event.creator ? actions(editSubject, deleteSubject) : undefined));
       events = [...events, {
         calendarEvents: createEventCalendar(event, userId === event.creator ? actions(editSubject, deleteSubject) : undefined),
         event

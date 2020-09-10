@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { NotificationItemModel } from '../notifications/models/notification-item.model';
 import { UserModel } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
-import { LoginResponseModel } from './models/login-response.model';
 import { LoginModel } from './models/login.model';
 
 const STORAGE_USER_ID_KEY: string = 'user-id';
@@ -21,6 +21,10 @@ export class AuthService {
 
   get userName(): string {
     return this.user?.name;
+  }
+
+  get userNotifications(): NotificationItemModel[] {
+    return this.user?.notifications;
   }
 
   private redirectUrl: string;
@@ -61,7 +65,7 @@ export class AuthService {
     return new Promise((resolve: () => void, reject: (error: HttpErrorResponse) => void): void => {
       this.httpClient.post(`${environment.apiConfig.path}/auth/login`, loginModel)
         .subscribe(
-          (res: LoginResponseModel) => {
+          (res: UserModel) => {
             this.setSession(res);
             resolve();
           },
@@ -92,8 +96,8 @@ export class AuthService {
     return res;
   }
 
-  private setSession(session: LoginResponseModel): void {
-    this.storage.setItem(STORAGE_USER_ID_KEY, `${session.user.id}`);
-    this.user = session.user;
+  private setSession(user: UserModel): void {
+    this.storage.setItem(STORAGE_USER_ID_KEY, `${user.id}`);
+    this.user = user;
   }
 }
