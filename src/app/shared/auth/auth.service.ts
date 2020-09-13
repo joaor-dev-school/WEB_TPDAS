@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { UserModel } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
+import { CreateUserModel } from './models/create-user.model';
 import { LoginResponseModel } from './models/login-response.model';
 import { LoginModel } from './models/login.model';
 
@@ -83,6 +84,17 @@ export class AuthService {
           (error: HttpErrorResponse) => reject(error)
         );
       this.user = null;
+    });
+  }
+
+  createUser(user: CreateUserModel): Promise<void> {
+    return new Promise((resolve: () => void, reject: (error: HttpErrorResponse) => void): void => {
+      this.httpClient
+        .post(`${environment.apiConfig.path}/auth/register`, user)
+        .subscribe(
+          () => resolve(),
+          (error: HttpErrorResponse) => reject(error)
+        );
     });
   }
 
