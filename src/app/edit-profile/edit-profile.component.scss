@@ -22,6 +22,12 @@
   text-align: center;
 }
 
+h1 {
+  margin: 10px auto 20px;
+  padding: 20px;
+  font-weight: bold;
+}
+
 /* TABS */
 
 h2.inactive {
@@ -127,4 +133,12 @@ input[type="password"]::placeholder {
     max-width: 100%;
     transform: translate(-50%, -50%) scale(0.7);
   }
+}
+
+.btn-exit {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }

@@ -1,26 +1,23 @@
-import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
-import { Injector, NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { Injector, NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AppRoutingModule } from "./app-routing.module";
-import { AppComponent } from "./app.component";
-import { AuthModule } from "./auth/auth.module";
-import { CoreModule } from "./core/core.module";
-import { Interceptor } from "./shared/auth/interceptor";
-import { EditProfileComponent } from "./edit-profile/edit-profile.component";
-import { ReactiveFormsModule } from "@angular/forms";
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
+import { CoreModule } from './core/core.module';
+import { Interceptor } from './shared/auth/interceptor';
 
 @NgModule({
-  declarations: [AppComponent, EditProfileComponent],
+  declarations: [AppComponent],
   imports: [
     AuthModule,
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    CoreModule,
-    ReactiveFormsModule,
+    CoreModule
   ],
   providers: [
     {
@@ -32,4 +29,5 @@ import { ReactiveFormsModule } from "@angular/forms";
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

@@ -1,73 +1,44 @@
 <div class="wrapper">
   <div id="formContent">
-    <div class="calendar-icon-container">
-      <img src="../../../assets/calendar-icon.png" alt="Calendar Icon" />
-    </div>
-    <form [formGroup]="userProfileForm" *ngIf="state.password == currentState">
-      <table>
-        <tr>
-          <td text-align: left>Password</td>
-          <input
-            type="password"
-            id="password"
-            name="login"
-            placeholder="password"
-            formControlName="password"
-          />
-        </tr>
-      </table>
-      <button (click)="changeProfile()">Submit</button>
-
-      <button (click)="exitChangeProfile()">Exit</button>
+    <h1>EDIT PROFILE</h1>
+    <form [formGroup]="userProfileForm" *ngIf="stateType == states.INITIAL">
+      <input type="password"
+             id="password"
+             name="login"
+             placeholder="password"
+             formControlName="password"/>
+      <button (click)="checkPassword()">Submit</button>
     </form>
 
-    <form [formGroup]="userProfileForm" *ngIf="state.menu == currentState">
+    <form [formGroup]="userProfileForm" *ngIf="stateType == states.MENU">
       <button (click)="enterChangePass()">Change Password</button>
       <button (click)="enterChangeUser()">Change Username</button>
-
-      <button (click)="exitChangeProfile()">Exit</button>
+      <button (click)="enterChangePreferences()">Change Preferences</button>
     </form>
 
-    <form
-      [formGroup]="userProfileForm"
-      *ngIf="state.changeUsername == currentState"
-    >
-      <table>
-        <tr>
-          <td text-align: left>Username</td>
-          <input
-            type="text"
-            id="login"
-            name="login"
-            placeholder="login"
-            formControlName="username"
-          />
-        </tr>
-      </table>
-      <button>Submit</button>
-
-      <button (click)="exitChangeProfile()">Exit</button>
+    <form [formGroup]="userProfileForm" *ngIf="stateType == states.NAME">
+      <input type="text"
+             id="login"
+             name="login"
+             placeholder="login"
+             formControlName="username"/>
+      <button (click)="changeUser()">Submit</button>
     </form>
 
-    <form
-      [formGroup]="userProfileForm"
-      *ngIf="state.changePassword == currentState"
-    >
-      <table>
-        <tr>
-          <td text-align: left>New password</td>
-          <input
-            type="password"
-            id="newpassword"
-            name="login"
-            placeholder="New password"
-            formControlName="newpassword"
-          />
-        </tr>
-      </table>
-      <button>Submit</button>
-
-      <button (click)="exitChangeProfile()">Exit</button>
+    <form [formGroup]="userProfileForm" *ngIf="stateType == states.PASSWORD">
+      <input type="password"
+             id="newpassword"
+             name="login"
+             placeholder="New password"
+             formControlName="password"/>
+      <input type="password"
+             id="confirmPassword"
+             name="login"
+             placeholder="Confirm password"
+             formControlName="confirmPassword"/>
+      <button (click)="changePassword()">Submit</button>
     </form>
+
+    <button class="btn-exit" (click)="exitChangeProfile()">Exit</button>
   </div>
 </div>

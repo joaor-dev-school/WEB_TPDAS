@@ -1,36 +1,31 @@
-import { EditProfileComponent } from "./edit-profile/edit-profile.component";
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
-import { MainComponent } from "./core/main/main.component";
-import { AuthGuard } from "./shared/auth/auth.guard";
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { MainComponent } from './core/main/main.component';
+import { AuthGuard } from './shared/auth/auth.guard';
 
 const routes: Routes = [
   {
-    path: "",
+    path: '',
     component: MainComponent,
     canActivate: [AuthGuard],
     children: [
       {
-        path: "calendar",
-        loadChildren: () =>
-          import("src/app/calendar/calendar.module").then(
-            (m) => m.CalendarModule
-          ),
+        path: 'calendar',
+        loadChildren: () => import('src/app/calendar/calendar.module').then((m) => m.CalendarModule),
       },
       {
-        path: "edit-profile",
-        component: EditProfileComponent,
-        pathMatch: "full",
+        path: 'edit-profile',
+        loadChildren: () => import('src/app/edit-profile/edit-profile.module').then((m) => m.EditProfileModule),
       },
-
-      { path: "**", redirectTo: "calendar" },
+      { path: '**', redirectTo: 'calendar' },
     ],
   },
-  { path: "**", redirectTo: "" },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule {
+}
