@@ -10,10 +10,10 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'calendar', loadChildren: () => import('src/app/calendar/calendar.module').then(m => m.CalendarModule) },
-      { path: '**', redirectTo: 'calendar' }
+      { path: '**', redirectTo: 'calendar', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

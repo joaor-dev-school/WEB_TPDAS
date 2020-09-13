@@ -3,14 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { CalendarComponent } from './calendar.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: CalendarComponent
-  },
-  {
-    path: '**',
-    redirectTo: ''
-  }
+  { path: '', component: CalendarComponent },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

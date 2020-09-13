@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { AlertModule } from 'ngx-bootstrap/alert';
 
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
@@ -13,14 +14,16 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     ModalModule.forRoot(),
     AlertModule.forRoot(),
     BsDropdownModule.forRoot(),
-    FontAwesomeModule
+    FontAwesomeModule,
+    MatBadgeModule
   ],
   exports: [
     BsDatepickerModule,
     ModalModule,
     AlertModule,
     BsDropdownModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    MatBadgeModule
   ]
 })
 export class NgxBootstrapModule {
