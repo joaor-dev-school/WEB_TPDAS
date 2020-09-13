@@ -26,4 +26,13 @@ input.form-control.checkbox-control {
 .nav-bar-container {
   height: $app-nav-height;
   position: relative;
+
+  .notifications-bell-container {
+    .mat-badge {
+      background: none;
+      border: none;
+      color: white;
+      outline: none;
+    }
+  }
 }

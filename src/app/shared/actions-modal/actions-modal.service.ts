@@ -17,14 +17,22 @@ export class ActionsModalService {
   }
 
   filenames(): Observable<FilenamesListModel> {
-    return this.httpClient.get<FilenamesListModel>(`${environment}/store/list`);
+    return this.httpClient.get<FilenamesListModel>(`${environment.apiConfig.path}/store/list`);
   }
 
   save(filename: string): Observable<void> {
-    return this.httpClient.put<void>(`${environment}/store/${filename}/save`, null);
+    return this.httpClient.put<void>(`${environment.apiConfig.path}/store/${filename}/save`, null);
   }
 
   load(filename: string): Observable<void> {
-    return this.httpClient.put<void>(`${environment}/store/${filename}/load`, null);
+    return this.httpClient.put<void>(`${environment.apiConfig.path}/store/${filename}/load`, null);
+  }
+
+  delete(filename: string): Observable<void> {
+    return this.httpClient.delete<void>(`${environment.apiConfig.path}/store/${filename}`);
+  }
+
+  reset(): Observable<void> {
+    return this.httpClient.delete<void>(`${environment.apiConfig.path}/store/reset`);
   }
 }

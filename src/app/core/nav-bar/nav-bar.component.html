@@ -3,23 +3,46 @@
     <button class="navbar-toggler" type="button" (click)="openActionsModal()">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="nav-bar-content position-relative" dropdown>
-      <div class="d-flex align-items-center cursor-pointer profile-info-container dropdown-toggle"
-           dropdownToggle aria-controls="menu-dropdown">
-        <img class="avatar" src="../../../assets/avatar.jpeg"/>
-        <span class="ml-xs">{{ name }}</span>
+    <div class="d-flex align-items-center">
+      <div class="notifications-bell-container position-relative" dropdown>
+        <button class="btn btn-icon mx-4" [matBadge]="notificationBadgeCounts" matBadgePosition="before"
+                matBadgeColor="accent" dropdownToggle aria-controls="menu-dropdown">
+          <fa-icon [icon]="bellIcon" class="p-2"></fa-icon>
+        </button>
+        <ng-container *ngIf="(notifications$ | async) as notifications">
+          <ul class="dropdown-menu dropdown-menu-right cursor-pointer" id="notifications-dropdown" *dropdownMenu
+              role="menu" aria-labelledby="button-basic">
+            <ng-container *ngFor="let notification of notifications">
+              <li class="dropdown-item p-0">
+                <div class="notification-container" [class.notification-read]="notification.read"
+                     (click)="!loadingNotification && markAsReadUnread(notification)">
+                  <span class="notification-name">{{notification.name}}</span>
+                  <span class="notification-participants">{{notification.totalParticipants}} participants</span>
+                  <span class="notification-date">{{notification.nextDateTimestamp | date}}</span>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </ng-container>
       </div>
-      <ul class="dropdown-menu dropdown-menu-right cursor-pointer" id="menu-dropdown" *dropdownMenu
-          role="menu" aria-labelledby="button-basic">
-        <li (click)="editProfile()" class="dropdown-item d-flex p-2">
-          <fa-icon [icon]="profileIcon"></fa-icon>
-          <span class="pl-3">Edit Profile</span>
-        </li>
-        <li (click)="logout()" class="dropdown-item d-flex p-2">
-          <fa-icon [icon]="logoutIcon"></fa-icon>
-          <span class="pl-3">Logout</span>
-        </li>
-      </ul>
+      <div class="nav-bar-content position-relative" dropdown>
+        <div class="d-flex align-items-center cursor-pointer profile-info-container dropdown-toggle"
+             dropdownToggle aria-controls="menu-dropdown">
+          <img class="avatar" src="../../../assets/avatar.jpeg"/>
+          <span class="ml-xs">{{ name }}</span>
+        </div>
+        <ul class="dropdown-menu dropdown-menu-right cursor-pointer" id="menu-dropdown" *dropdownMenu
+            role="menu" aria-labelledby="button-basic">
+          <li (click)="editProfile()" class="dropdown-item d-flex p-2">
+            <fa-icon [icon]="profileIcon"></fa-icon>
+            <span class="pl-3">Edit Profile</span>
+          </li>
+          <li (click)="logout()" class="dropdown-item d-flex p-2">
+            <fa-icon [icon]="logoutIcon"></fa-icon>
+            <span class="pl-3">Logout</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </nav>

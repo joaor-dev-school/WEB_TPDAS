@@ -9,6 +9,8 @@ import { take } from 'rxjs/operators';
 
 import { ActionsModalService } from '../../shared/actions-modal/actions-modal.service';
 import { FilenamesListModel } from '../../shared/actions-modal/models/filenames-list.model';
+import { AlertModalManagerService } from '../../shared/alert-manager/alert-modal-manager.service';
+import { createFormErrorAlert, createFormSuccessAlert } from '../../shared/alert-manager/models/alert-modal.model';
 
 @Component({
   selector: 'app-actions-modal',
@@ -18,6 +20,8 @@ import { FilenamesListModel } from '../../shared/actions-modal/models/filenames-
 export class ActionsModalComponent implements OnInit, OnDestroy {
 
   @ViewChild('modalContent', { static: true }) modalContent: TemplateRef<any>;
+
+  filenameValue: string;
 
   checkIcon: IconDefinition = faCheckSquare;
 
@@ -32,11 +36,13 @@ export class ActionsModalComponent implements OnInit, OnDestroy {
   private modalRef: BsModalRef;
   private readonly subscriptions: Subscription[];
 
-  constructor(private modalService: BsModalService, private readonly actionsModalService: ActionsModalService) {
+  constructor(private modalService: BsModalService, private readonly actionsModalService: ActionsModalService,
+              private readonly alertService: AlertModalManagerService) {
     this.subscriptions = [];
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(this.modalService.onHide.subscribe(() => this.modalRef = null));
     this.subscribeForOpenModal();
   }
 
@@ -46,7 +52,44 @@ export class ActionsModalComponent implements OnInit, OnDestroy {
 
   closeModal(): void {
     this.modalRef?.hide();
-    this.modalRef = null;
+  }
+
+  saveCalendar(): void {
+    if (this.filenameValue) {
+      this.actionsModalService.save(this.filenameValue)
+        .pipe(take(1))
+        .subscribe(
+          () => this.handleSaveCalendarSuccess(),
+          (error: HttpErrorResponse) => this.handleSaveCalendarError(error)
+        );
+    }
+  }
+
+  loadCalendar(filename: string): void {
+    this.actionsModalService.load(filename)
+      .pipe(take(1))
+      .subscribe(
+        () => this.handleLoadCalendarSuccess(),
+        (error: HttpErrorResponse) => this.handleLoadCalendarError(error)
+      );
+  }
+
+  removeCalendar(filename: string): void {
+    this.actionsModalService.delete(filename)
+      .pipe(take(1))
+      .subscribe(
+        () => this.handleDeleteCalendarSuccess(),
+        (error: HttpErrorResponse) => this.handleDeleteCalendarError(error)
+      );
+  }
+
+  resetCalendar(): void {
+    this.actionsModalService.reset()
+      .pipe(take(1))
+      .subscribe(
+        () => this.handleResetCalendarSuccess(),
+        (error: HttpErrorResponse) => this.handleResetCalendarError(error)
+      );
   }
 
   private fetchFilenames(): void {
@@ -81,6 +124,47 @@ export class ActionsModalComponent implements OnInit, OnDestroy {
     console.error(error);
     this.hasError = true;
     this.isLoading = false;
+  }
+
+  private handleSaveCalendarSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Calendar saved with success'));
+    this.filenameValue = null;
+    this.fetchFilenames();
+  }
+
+  private handleSaveCalendarError(error: HttpErrorResponse): void {
+    console.error(error);
+    this.alertService.next(createFormErrorAlert('Error saving the calendar! Try again later...'));
+  }
+
+  private handleLoadCalendarSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Calendar loaded with success'));
+    this.actionsModalService.changesMade.next();
+  }
+
+  private handleLoadCalendarError(error: HttpErrorResponse): void {
+    console.error(error);
+    this.alertService.next(createFormErrorAlert('Error loading the calendar! Try again later...'));
+  }
+
+  private handleDeleteCalendarSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Calendar deleted with success'));
+    this.fetchFilenames();
+  }
+
+  private handleDeleteCalendarError(error: HttpErrorResponse): void {
+    console.error(error);
+    this.alertService.next(createFormErrorAlert('Error deleting the calendar! Try again later...'));
+  }
+
+  private handleResetCalendarSuccess(): void {
+    this.alertService.next(createFormSuccessAlert('Calendar reset with success'));
+    this.actionsModalService.changesMade.next();
+  }
+
+  private handleResetCalendarError(error: HttpErrorResponse): void {
+    console.error(error);
+    this.alertService.next(createFormErrorAlert('Error reset the calendar! Try again later...'));
   }
 
 }

@@ -1,0 +1,40 @@
+<div class="wrapper">
+  <div id="formContent">
+    <div class="calendar-icon-container">
+      <img src="../../../assets/calendar-icon.png" alt="Calendar Icon"/>
+    </div>
+    <form [formGroup]="createUserForm">
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{errorMessage}}
+      </div>
+      <input type="text"
+             id="login"
+             name="login"
+             placeholder="username"
+             formControlName="username"
+             (keyup)="errorMessage = null"/>
+      <input type="password"
+             id="password"
+             name="login"
+             placeholder="password"
+             formControlName="password"
+             (keyup)="errorMessage = null"/>
+      <input type="password"
+             id="confirmpassword"
+             name="login"
+             placeholder="confirm password"
+             formControlName="confirmpassword"
+             (keyup)="errorMessage = null"/>
+      <input type="text"
+             id="name"
+             name="login"
+             placeholder="name"
+             formControlName="name"
+             (keyup)="errorMessage = null"/>
+      <div class="mt-1">
+        <button [disabled]="isSubmitting" (click)="createUser()">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+

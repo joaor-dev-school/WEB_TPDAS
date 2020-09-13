@@ -17,15 +17,15 @@ const routes: Routes = [
         path: 'edit-profile',
         loadChildren: () => import('src/app/edit-profile/edit-profile.module').then((m) => m.EditProfileModule),
       },
-      { path: '**', redirectTo: 'calendar' },
+      { path: '**', redirectTo: 'calendar', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {
 }

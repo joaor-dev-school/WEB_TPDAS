@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { NotificationItemModel } from '../notifications/models/notification-item.model';
 import { BooleanMessage } from '../messages/boolean.message';
 import { EmptyMessage } from '../messages/empty.message';
 import { ErrorResponseMessage } from '../messages/error-response.message';
 import { UserModel } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
-import { LoginResponseModel } from './models/login-response.model';
+import { CreateUserModel } from './models/create-user.model';
 import { LoginModel } from './models/login.model';
 
 const STORAGE_USER_ID_KEY: string = 'user-id';
@@ -17,12 +18,17 @@ const STORAGE_USER_ID_KEY: string = 'user-id';
   providedIn: 'root',
 })
 export class AuthService {
+
   get userId(): number {
     return this.user?.id;
   }
 
   get userName(): string {
     return this.user?.name;
+  }
+
+  get userNotifications(): NotificationItemModel[] {
+    return this.user?.notifications;
   }
 
   private redirectUrl: string;
@@ -61,18 +67,16 @@ export class AuthService {
   }
 
   login(loginModel: LoginModel): Promise<void> {
-    return new Promise((resolve: EmptyMessage, reject: ErrorResponseMessage): void => {
-        this.httpClient
-          .post(`${environment.apiConfig.path}/auth/login`, loginModel)
-          .subscribe(
-            (res: LoginResponseModel) => {
-              this.setSession(res);
-              resolve();
-            },
-            (error: HttpErrorResponse) => reject(error)
-          );
-      }
-    );
+    return new Promise((resolve: () => void, reject: (error: HttpErrorResponse) => void): void => {
+      this.httpClient.post(`${environment.apiConfig.path}/auth/login`, loginModel)
+        .subscribe(
+          (res: UserModel) => {
+            this.setSession(res);
+            resolve();
+          },
+          (error: HttpErrorResponse) => reject(error)
+        );
+    });
   }
 
   logout(): Promise<void> {
@@ -91,6 +95,17 @@ export class AuthService {
         this.user = null;
       }
     );
+  }
+
+  createUser(user: CreateUserModel): Promise<void> {
+    return new Promise((resolve: () => void, reject: (error: HttpErrorResponse) => void): void => {
+      this.httpClient
+        .post(`${environment.apiConfig.path}/auth/register`, user)
+        .subscribe(
+          () => resolve(),
+          (error: HttpErrorResponse) => reject(error)
+        );
+    });
   }
 
   redirectToPreviousUrl(): Promise<boolean> {
@@ -136,8 +151,8 @@ export class AuthService {
     });
   }
 
-  private setSession(session: LoginResponseModel): void {
-    this.storage.setItem(STORAGE_USER_ID_KEY, `${session.user.id}`);
-    this.user = session.user;
+  private setSession(user: UserModel): void {
+    this.storage.setItem(STORAGE_USER_ID_KEY, `${user.id}`);
+    this.user = user;
   }
 }

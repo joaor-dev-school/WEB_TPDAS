@@ -7,12 +7,22 @@
       <div *ngIf="hasError" class="alert alert-danger">
         Login failed! Wrong username or password
       </div>
-      <input type="text" id="login" name="login" placeholder="login"
-             formControlName="username" (keyup)="hasError = false">
-      <input type="password" id="password" name="login" placeholder="password"
-             formControlName="password" (keyup)="hasError = false">
-      <button [disabled]="isSubmitting" (click)="submit()">Log In</button>
+      <input type="text"
+             id="login"
+             name="login"
+             placeholder="login"
+             formControlName="username"
+             (keyup)="hasError = false"/>
+      <input type="password"
+             id="password"
+             name="login"
+             placeholder="password"
+             formControlName="password"
+             (keyup)="hasError = false"/>
+      <div class="mt-1">
+        <button [disabled]="isSubmitting" (click)="submit()">Log In</button>
+        <button [disabled]="isSubmitting" (click)="create()">Create User</button>
+      </div>
     </form>
-
   </div>
 </div>

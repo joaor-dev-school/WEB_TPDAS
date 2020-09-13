@@ -36,6 +36,39 @@
   }
 }
 
+.notification-container {
+  align-items: center;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  padding: 8px;
+
+  .notification-name {
+    width: 175px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .notification-participants {
+    color: $app-color-gray;
+    font-size: 0.6rem;
+    overflow: hidden;
+    padding-left: 2px;
+    text-overflow: ellipsis;
+    text-align: right;
+    white-space: nowrap;
+    width: 75px;
+  }
+
+  .notification-date {
+    color: $app-color-gray;
+  }
+
+  &.notification-read {
+    background: $app-color-light-gray;
+  }
+}
+
 @media (min-width: $app-screen-sm) {
   .nav-bar {
     .nav-bar-content {
