@@ -12,9 +12,8 @@ export class EditProfileInitialState extends EditProfileStateAdapter {
     super(data, EditProfileStatesEnum.INITIAL);
   }
 
-  changePass(password: string): Promise<IEditProfileState> {
+  checkPassword(password: string): Promise<IEditProfileState> {
     return new Promise((resolve: EditProfileStateMessage) => {
-      console.log(password)
       this.data.isSubmitting = true;
       this.authService.checkPassword(password)
         .then(() => {

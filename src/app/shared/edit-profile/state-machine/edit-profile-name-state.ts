@@ -32,4 +32,8 @@ export class EditProfileNameState extends EditProfileStateAdapter {
         });
     });
   }
+
+  back(): IEditProfileState {
+    return new EditProfileMenuState(this.data);
+  }
 }

@@ -11,8 +11,8 @@ export abstract class EditProfileStateAdapter implements IEditProfileState {
   type: EditProfileStatesEnum;
   data: EditProfileStateDataModel;
 
-  get formUsername(): AbstractControl {
-    return this.data?.form.get('username');
+  get formName(): AbstractControl {
+    return this.data?.form.get('name');
   }
 
   get formPassword(): AbstractControl {
@@ -70,6 +70,10 @@ export abstract class EditProfileStateAdapter implements IEditProfileState {
 
   exitChangeProfile(): Promise<IEditProfileState> {
     return Promise.resolve(this);
+  }
+
+  back(): IEditProfileState {
+    return this;
   }
 
   getType(): EditProfileStatesEnum {

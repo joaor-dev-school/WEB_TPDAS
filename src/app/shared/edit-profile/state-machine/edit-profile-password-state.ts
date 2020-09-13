@@ -15,6 +15,7 @@ export class EditProfilePasswordState extends EditProfileStateAdapter {
 
   changePass(password: string): Promise<IEditProfileState> {
     return new Promise((resolve: EditProfileStateMessage): void => {
+      console.log(password, this.formConfirmPassword.value !== password);
       if (this.formConfirmPassword.value !== password) {
         this.data.errorMessage = 'The passwords don\'t match!';
         return resolve(this);
@@ -36,5 +37,9 @@ export class EditProfilePasswordState extends EditProfileStateAdapter {
           resolve(this);
         });
     });
+  }
+
+  back(): IEditProfileState {
+    return new EditProfileMenuState(this.data);
   }
 }

@@ -2,10 +2,11 @@
   <div id="formContent">
     <h1>EDIT PROFILE</h1>
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.INITIAL">
+      <ng-container [ngTemplateOutlet]="error"></ng-container>
       <input type="password"
              id="password"
              name="login"
-             placeholder="password"
+             placeholder="Password"
              formControlName="password"/>
       <button (click)="checkPassword()">Submit</button>
     </form>
@@ -17,15 +18,18 @@
     </form>
 
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.NAME">
+      <ng-container [ngTemplateOutlet]="error"></ng-container>
       <input type="text"
              id="login"
-             name="login"
-             placeholder="login"
-             formControlName="username"/>
+             name="name"
+             placeholder="Name"
+             formControlName="name"/>
       <button (click)="changeUser()">Submit</button>
+      <button (click)="back()">Back</button>
     </form>
 
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.PASSWORD">
+      <ng-container [ngTemplateOutlet]="error"></ng-container>
       <input type="password"
              id="newpassword"
              name="login"
@@ -37,8 +41,15 @@
              placeholder="Confirm password"
              formControlName="confirmPassword"/>
       <button (click)="changePassword()">Submit</button>
+      <button (click)="back()">Back</button>
     </form>
 
     <button class="btn-exit" (click)="exitChangeProfile()">Exit</button>
   </div>
 </div>
+
+<ng-template #error>
+  <div *ngIf="stateData.errorMessage" class="alert alert-danger">
+    {{stateData.errorMessage}}
+  </div>
+</ng-template>

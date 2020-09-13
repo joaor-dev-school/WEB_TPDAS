@@ -18,5 +18,7 @@ export interface IEditProfileState {
 
   exitChangeProfile(): Promise<IEditProfileState>;
 
+  back(): IEditProfileState;
+
   getType(): EditProfileStatesEnum;
 }

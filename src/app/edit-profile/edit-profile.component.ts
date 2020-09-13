@@ -4,7 +4,6 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AlertModalManagerService } from '../shared/alert-manager/alert-modal-manager.service';
 import { createFormErrorAlert } from '../shared/alert-manager/models/alert-modal.model';
 import { AuthService } from '../shared/auth/auth.service';
-import { state } from '@angular/animations';
 import { Router } from '@angular/router';
 import { EditProfileStateDataModel, initialEditProfileStateData } from '../shared/edit-profile/models/edit-profile-state-data.model';
 import { EditProfileStatesEnum } from '../shared/edit-profile/models/edit-profile-states.enum';
@@ -33,7 +32,7 @@ export class EditProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.userProfileForm = this.fb.group({
-      username: this.fb.control('', [Validators.required, Validators.min(5)]),
+      name: this.fb.control('', [Validators.required, Validators.min(5)]),
       password: this.fb.control('', [Validators.required, Validators.min(5)]),
       confirmPassword: this.fb.control('', [Validators.required, Validators.min(5)])
     });
@@ -58,7 +57,12 @@ export class EditProfileComponent implements OnInit {
   }
 
   exitChangeProfile(): void {
-    this.router.navigate(['calendar']);
+    this.router.navigate(['calendar'])
+      .catch((error: any) => console.error(error));
+  }
+
+  back(): void {
+    this.state = this.state.back();
   }
 
   async changeUser(): Promise<void> {
@@ -66,6 +70,6 @@ export class EditProfileComponent implements OnInit {
   }
 
   async changePassword(): Promise<void> {
-    this.state = await this.state.changeUser(this.userProfileForm.get('password').value);
+    this.state = await this.state.changePass(this.userProfileForm.get('password').value);
   }
 }

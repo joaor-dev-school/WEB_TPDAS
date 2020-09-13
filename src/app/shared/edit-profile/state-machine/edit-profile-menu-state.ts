@@ -9,7 +9,7 @@ import { IEditProfileState } from './i-edit-profile-state';
 export class EditProfileMenuState extends EditProfileStateAdapter {
   constructor(data: EditProfileStateDataModel) {
     super(data, EditProfileStatesEnum.MENU);
-    this.formUsername.setValue(null);
+    this.formName.setValue(null);
     this.formPassword.setValue(null);
     this.formConfirmPassword.setValue(null);
     this.data.isSubmitting = false;
