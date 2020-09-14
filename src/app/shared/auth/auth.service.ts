@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { UserSchedulingPreferencesModel } from '../edit-profile/models/user-scheduling-preferences.model';
 import { NotificationItemModel } from '../notifications/models/notification-item.model';
 import { BooleanMessage } from '../messages/boolean.message';
 import { EmptyMessage } from '../messages/empty.message';
@@ -144,6 +145,16 @@ export class AuthService {
       }
       this.httpClient
         .post(`${environment.apiConfig.path}/auth/check-password`, { username: this.user.username, password })
+        .subscribe(
+          () => resolve(),
+          (error: HttpErrorResponse) => reject(error)
+        );
+    });
+  }
+
+  changePreferences(preferences: UserSchedulingPreferencesModel): Promise<void> {
+    return new Promise((resolve: EmptyMessage, reject: ErrorResponseMessage): void => {
+      this.httpClient.put(`${environment.apiConfig.path}/user/calendar_preferences`, preferences)
         .subscribe(
           () => resolve(),
           (error: HttpErrorResponse) => reject(error)

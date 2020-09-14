@@ -44,8 +44,8 @@ export abstract class EditProfileStateAdapter implements IEditProfileState {
     return Promise.resolve(this);
   }
 
-  changePreferences(preferences: UserSchedulingPreferencesModel): IEditProfileState {
-    return this;
+  changePreferences(preferences: UserSchedulingPreferencesModel): Promise<IEditProfileState> {
+    return Promise.resolve(this);
   }
 
   changeUser(name: string): Promise<IEditProfileState> {

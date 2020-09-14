@@ -14,7 +14,7 @@ export interface IEditProfileState {
 
   enterChangePreferences(): IEditProfileState;
 
-  changePreferences(preferences: UserSchedulingPreferencesModel): IEditProfileState;
+  changePreferences(preferences: UserSchedulingPreferencesModel): Promise<IEditProfileState>;
 
   exitChangeProfile(): Promise<IEditProfileState>;
 

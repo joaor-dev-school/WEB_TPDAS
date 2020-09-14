@@ -1,14 +1,23 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AlertModalManagerService } from '../shared/alert-manager/alert-modal-manager.service';
-import { createFormErrorAlert } from '../shared/alert-manager/models/alert-modal.model';
-import { AuthService } from '../shared/auth/auth.service';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { parseDate } from 'ngx-bootstrap/chronos';
+
+import { AlertModalManagerService } from '../shared/alert-manager/alert-modal-manager.service';
+import { AuthService } from '../shared/auth/auth.service';
 import { EditProfileStateDataModel, initialEditProfileStateData } from '../shared/edit-profile/models/edit-profile-state-data.model';
 import { EditProfileStatesEnum } from '../shared/edit-profile/models/edit-profile-states.enum';
+import {
+  UserSchedulingPreferenceTypeEnum,
+  userSchedulingPreferenceTypes
+} from '../shared/edit-profile/models/user-scheduling-preference-type.enum';
+import { UserSchedulingPreferenceModel } from '../shared/edit-profile/models/user-scheduling-preference.model';
+import { UserSchedulingPreferencesModel } from '../shared/edit-profile/models/user-scheduling-preferences.model';
 import { EditProfileInitialState } from '../shared/edit-profile/state-machine/edit-profile-initial-state';
 import { IEditProfileState } from '../shared/edit-profile/state-machine/i-edit-profile-state';
+import { INPUT_DATE_FORMAT } from '../shared/events/utils/events.utils';
+
+type PrefType = 'preferred' | 'acceptable';
 
 @Component({
   selector: 'app-edit-profile',
@@ -22,19 +31,30 @@ export class EditProfileComponent implements OnInit {
   stateData: EditProfileStateDataModel;
   userProfileForm: FormGroup;
 
+  preferenceTypes: UserSchedulingPreferenceTypeEnum[];
+
+  get preferencesFormArray(): FormArray {
+    return this.userProfileForm.get('preferences') as FormArray;
+  }
+
   get stateType(): EditProfileStatesEnum {
     return this.state?.getType();
   }
 
+  readonly inputDateFormat: string;
+
   constructor(private readonly fb: FormBuilder, private readonly authService: AuthService, private readonly router: Router,
               private readonly alertService: AlertModalManagerService) {
+    this.inputDateFormat = INPUT_DATE_FORMAT;
+    this.preferenceTypes = userSchedulingPreferenceTypes();
   }
 
   ngOnInit(): void {
     this.userProfileForm = this.fb.group({
       name: this.fb.control('', [Validators.required, Validators.min(5)]),
       password: this.fb.control('', [Validators.required, Validators.min(5)]),
-      confirmPassword: this.fb.control('', [Validators.required, Validators.min(5)])
+      confirmPassword: this.fb.control('', [Validators.required, Validators.min(5)]),
+      preferences: this.fb.array([this.createEmptyPreferenceControl()])
     });
     this.stateData = initialEditProfileStateData(this.router, this.authService, this.alertService, this.userProfileForm);
     this.state = new EditProfileInitialState(this.stateData);
@@ -71,5 +91,41 @@ export class EditProfileComponent implements OnInit {
 
   async changePassword(): Promise<void> {
     this.state = await this.state.changePass(this.userProfileForm.get('password').value);
+  }
+
+  async changePreferences(): Promise<void> {
+    this.state = await this.state.changePreferences(this.getPreferencesModel());
+  }
+
+  addPreference(): void {
+    this.preferencesFormArray.push(this.createEmptyPreferenceControl());
+  }
+
+  removePreference(prefIndex: number): void {
+    this.preferencesFormArray.removeAt(prefIndex);
+  }
+
+  private getPreferencesModel(): UserSchedulingPreferencesModel {
+    const preferred: UserSchedulingPreferenceModel[] = [];
+    const acceptable: UserSchedulingPreferenceModel[] = [];
+    for (const preferenceControl of this.preferencesFormArray.controls) {
+      const pref: UserSchedulingPreferenceModel = {
+        fromTimestamp: parseDate(preferenceControl.get('from').value, this.inputDateFormat).getTime(),
+        toTimestamp: parseDate(preferenceControl.get('to').value, this.inputDateFormat).getTime(),
+        type: preferenceControl.get('type').value
+      };
+
+      preferenceControl.get('prefType').value === 'preferred' ? preferred.push(pref) : acceptable.push(pref);
+    }
+    return { userId: this.authService.userId, preferred, acceptable };
+  }
+
+  private createEmptyPreferenceControl(): AbstractControl {
+    return this.fb.group({
+      type: this.fb.control(''),
+      from: this.fb.control(''),
+      to: this.fb.control(''),
+      prefType: this.fb.control('preferred')
+    });
   }
 }

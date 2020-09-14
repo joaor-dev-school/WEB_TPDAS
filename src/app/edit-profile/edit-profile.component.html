@@ -8,13 +8,13 @@
              name="login"
              placeholder="Password"
              formControlName="password"/>
-      <button (click)="checkPassword()">Submit</button>
+      <button class="btn-form" (click)="checkPassword()">Submit</button>
     </form>
 
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.MENU">
-      <button (click)="enterChangePass()">Change Password</button>
-      <button (click)="enterChangeUser()">Change Username</button>
-      <button (click)="enterChangePreferences()">Change Preferences</button>
+      <button class="btn-form" (click)="enterChangePass()">Change Password</button>
+      <button class="btn-form" (click)="enterChangeUser()">Change Username</button>
+      <button class="btn-form" (click)="enterChangePreferences()">Change Preferences</button>
     </form>
 
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.NAME">
@@ -24,8 +24,8 @@
              name="name"
              placeholder="Name"
              formControlName="name"/>
-      <button (click)="changeUser()">Submit</button>
-      <button (click)="back()">Back</button>
+      <button class="btn-form" (click)="changeUser()">Submit</button>
+      <button class="btn-form" (click)="back()">Back</button>
     </form>
 
     <form [formGroup]="userProfileForm" *ngIf="stateType == states.PASSWORD">
@@ -40,11 +40,66 @@
              name="login"
              placeholder="Confirm password"
              formControlName="confirmPassword"/>
-      <button (click)="changePassword()">Submit</button>
-      <button (click)="back()">Back</button>
+      <button class="btn-form" (click)="changePassword()">Submit</button>
+      <button class="btn-form" (click)="back()">Back</button>
     </form>
 
-    <button class="btn-exit" (click)="exitChangeProfile()">Exit</button>
+    <form [formGroup]="userProfileForm" *ngIf="stateType == states.PREFERENCES">
+      <ng-container [ngTemplateOutlet]="error"></ng-container>
+      <ng-container formArrayName="preferences">
+        <div class="date-container form-group"
+             *ngFor="let prefGroup of preferencesFormArray.controls; let prefGroupIndex = index">
+          <ng-container [formGroup]="prefGroup">
+            <div class="remove-rule-button-container">
+              <button class="btn btn-icon" *ngIf="preferencesFormArray.controls.length > 1"
+                      (click)="removePreference(prefGroupIndex)">
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                        d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                  <path fill-rule="evenodd"
+                        d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="date-input-container">
+              <label [for]="'from'+prefGroupIndex">Start Date</label>
+              <input formControlName="from" [id]="'from'+prefGroupIndex" class="form-control" type="text"
+                     bsDatepicker [bsConfig]="{ dateInputFormat: inputDateFormat, containerClass: 'theme-green' }">
+            </div>
+            <div class="date-input-container">
+              <label [for]="'to'+prefGroupIndex">End Date</label>
+              <input formControlName="to" [id]="'to'+prefGroupIndex" class="form-control" type="text"
+                     bsDatepicker [bsConfig]="{ dateInputFormat: inputDateFormat, containerClass: 'theme-blue' }">
+            </div>
+            <div class="date-input-container">
+              <label [for]="'to'+prefGroupIndex">Type</label>
+              <select formControlName="type" [id]="'type'+prefGroupIndex" class="form-control">
+                <option [value]="null">None</option>
+                <option *ngFor="let type of preferenceTypes" [value]="type">{{type}}</option>
+              </select>
+            </div>
+          </ng-container>
+        </div>
+        <div class="add-day-icon-container">
+          <button class="btn btn-icon" (click)="addPreference()">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-plus-circle" fill="currentColor"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                    d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
+              <path fill-rule="evenodd"
+                    d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
+              <path fill-rule="evenodd"
+                    d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            </svg>
+          </button>
+        </div>
+      </ng-container>
+      <button class="btn-form" (click)="changePreferences()">Submit</button>
+      <button class="btn-form" (click)="back()">Back</button>
+    </form>
+
+    <button class="btn-form btn-exit" (click)="exitChangeProfile()">Exit</button>
   </div>
 </div>
 

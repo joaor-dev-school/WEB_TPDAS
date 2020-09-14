@@ -1,3 +1,5 @@
+@import '../../scss/colors';
+
 .wrapper {
   display: flex;
   align-items: center;
@@ -41,8 +43,7 @@ h2.active {
 
 /* FORM TYPOGRAPHY*/
 
-input[type="button"],
-button,
+.btn-form,
 input[type="reset"] {
   background-color: #56baed;
   border: none;
@@ -65,14 +66,12 @@ input[type="reset"] {
   transition: all 0.3s ease-in-out;
 }
 
-input[type="button"]:hover,
-button:hover,
+.btn-form:hover,
 input[type="reset"]:hover {
   background-color: #39ace7;
 }
 
-input[type="button"]:active,
-button:active,
+.btn-form:active,
 input[type="reset"]:active {
   -moz-transform: scale(0.95);
   -webkit-transform: scale(0.95);
@@ -141,4 +140,41 @@ input[type="password"]::placeholder {
   margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.date-container {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 10px;
+
+  &:nth-child(2n) {
+    background: $app-color-light-gray;
+  }
+}
+
+.remove-rule-button-container {
+  position: relative;
+  height: 30px;
+  width: 100%;
+
+  button {
+    box-shadow: none;
+    color: $app-color-gray;
+    outline: none;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.btn.btn-icon:focus, .btn.btn-icon.focus {
+  outline: 0;
+  box-shadow: none;
 }
