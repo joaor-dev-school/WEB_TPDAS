@@ -6,10 +6,10 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faBell, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
 import { ActionsModalService } from '../../shared/actions-modal/actions-modal.service';
 import { AlertModalManagerService } from '../../shared/alert-manager/alert-modal-manager.service';
 import { createFormErrorAlert } from '../../shared/alert-manager/models/alert-modal.model';
-
 import { AuthService } from '../../shared/auth/auth.service';
 import { NotificationItemModel } from '../../shared/notifications/models/notification-item.model';
 import { NotificationsService } from '../../shared/notifications/notifications.service';
@@ -46,9 +46,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.notificationBadgeCounts = 0;
   }
 
-  /**
-   * Handles initialization tasks.
-   */
   ngOnInit(): void {
     this.name = this.authService.userName;
     this.notifications$ = this.notificationsService.notificationsObservable
@@ -65,16 +62,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
    * Opens the edit profile form drawer.
    */
   editProfile(): void {
-    /*const title: string = 'profile.form.title';
-    this.drawerService.create<ProfileFormDrawerComponent, ProfileDrawerParametersModel>({
-      nzContent: ProfileFormDrawerComponent,
-      nzWrapClassName: 'small-form-drawer form-drawer',
-      nzClosable: false,
-      nzMaskClosable: false,
-      nzContentParams: {
-        title
-      }
-    });*/
+    this.router.navigate(['edit-profile'])
+      .catch((error: Error) => console.error(error));
   }
 
   markAsReadUnread(notification: NotificationItemModel): void {

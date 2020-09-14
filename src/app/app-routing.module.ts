@@ -9,9 +9,16 @@ const routes: Routes = [
     component: MainComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'calendar', loadChildren: () => import('src/app/calendar/calendar.module').then(m => m.CalendarModule) },
-      { path: '**', redirectTo: 'calendar', pathMatch: 'full' }
-    ]
+      {
+        path: 'calendar',
+        loadChildren: () => import('src/app/calendar/calendar.module').then((m) => m.CalendarModule),
+      },
+      {
+        path: 'edit-profile',
+        loadChildren: () => import('src/app/edit-profile/edit-profile.module').then((m) => m.EditProfileModule),
+      },
+      { path: '**', redirectTo: 'calendar', pathMatch: 'full' },
+    ],
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

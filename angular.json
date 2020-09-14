@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "web-tpdas"
+    }
+  },
+  "defaultProject": "web-tpdas",
+  "cli": {
+    "analytics": "9aa3ebf7-ff64-427e-81ad-6861dc63e094"
+  }
 }

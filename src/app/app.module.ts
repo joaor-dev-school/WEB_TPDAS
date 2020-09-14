@@ -10,9 +10,7 @@ import { CoreModule } from './core/core.module';
 import { Interceptor } from './shared/auth/interceptor';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     AuthModule,
     AppRoutingModule,
@@ -26,10 +24,10 @@ import { Interceptor } from './shared/auth/interceptor';
       provide: HTTP_INTERCEPTORS,
       useClass: Interceptor,
       deps: [Injector],
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }
